@@ -1,10 +1,10 @@
 #! /usr/bin/env python3
 #################################################################################
 #     File Name           :     ipv4.py
-#     Version             :     V2
+#     Version             :     V3
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-05-21 19:36]
-#     Last Modified       :     [2018-06-13 19:10]
+#     Last Modified       :     [2018-06-13 19:28]
 #     Description         :      
 #################################################################################
 
@@ -13,16 +13,14 @@ import sys
 IPs = ["192.168.19.128/24", "192.168.225.64/26", "172.16.33.213/27", "10.128.63.229"]
 
 def ip_calc(ip):
-    ip, mask = ip_oct_check(ip)
-    if ip and mask:
-        bit_mask = convert_int_to_bits(mask)
-        bit_ip = ip_bin(ip)
-        bit_network = bin(int(bit_mask, base=2) & int(bit_ip, base=2))[2:]
-        n_hosts = bit_mask.count('0') * '1'
-        bit_broadcast = bin(int(bit_network, base=2) + int(n_hosts, base=2))[2:]
-        print('%s\n%s\n%s\n%s' % tuple(map(bin32_to_ip, [bit_ip, bit_mask, bit_network, bit_broadcast])))
+    ip, mask = ip_mask_check(ip)
+    ip = ip_bin(ip)
+    mask = convert_int_to_bits(mask)
+    network = network_calc(ip, mask)
+    broadcast = broadcast_calc(mask, network)
+    return (ip, mask, network, broadcast)
 
-def check_ip_mask(ip):
+def ip_mask_check(ip):
     '''Check if it is a valid IPv4 address
     Return:
       A list of IPv4 octet
@@ -62,38 +60,45 @@ def convert_decimal_to_bits(decimal, bits_total=8):
     return decimal
 
 def ip_bin(ip):
-    return ''.join([b for b in map(ip_normalize, ip)])
+    return ''.join([b for b in map(convert_decimal_to_bits, ip)])
 
-def bin32_to_ip(bits):
+def bits32_to_ip(bits):
     def base10(bits):
         if not bits:
             return ''
         else:
-            return str(int(bits[0:8], base=2)) + '.' + bin32_to_ip(bits[8:])
+            return str(int(bits[0:8], base=2)) + '.' + bits32_to_ip(bits[8:])
     return base10(bits).rstrip('.')
 
+def network_calc(ip, mask):
+    return convert_decimal_to_bits(int(ip, base=2) & int(mask, base=2), bits_total=32)
 
+def broadcast_calc(mask, network):
+    bits = mask.count('0')
+    if bits > 0:
+        broadcast = int(network, base=2) + int(bits * '1', base=2)
+        return convert_decimal_to_bits(broadcast, bits_total=32)
+    else:
+        return network
 
-'''
-def mask_ip(ip, mask):
-    network = []
-    for o in range(4):
-        network.append(int(ip[o], base=2) & int(mask[o], base=2))
-    return network
-'''
+def ip_hosts(network, broadcast):
+    hosts = set([network, broadcast])
+    first, last = int(network, base=2), int(broadcast, base=2)
+    for host in range(first, last):
+        hosts.add(bin(host)[2:])
+    return hosts
 
+def show_hosts(hosts):
+    for host in sorted(hosts):
+        print(bits32_to_ip(host) + '/32')
 
 # Exec main test
 def main(ips):
     for ip in ips:
-        ip_calc(ip)
-        print()
-        '''
-        ip_b, mask = block_ipv4(ip)
-        ip_bits = list(map(ip_bin, ip_b))
-        mask_bits = mask_bin(mask)
-        #yield (ip_b, ip_bits, mask_bits)
-        network = mask_ip(ip_bits, mask_bits)
-        print('IP: %s:\nIP Bits: %10s\nMask Bits: %10s\nNetwork: %10s\n' % (ip, ip_bits, mask_bits, network))
-        #yield ip_b, ip_bits, mask_bits, network
-        '''
+        ip, mask, network, broadcast = ip_calc(ip)
+        hosts = ip_hosts(network, broadcast)
+        show_hosts(hosts)
+        input('\n----Press Enter----')
+
+if __name__ == '__main__':
+    main(IPs)
