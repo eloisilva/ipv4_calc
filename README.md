@@ -3,4 +3,4 @@
 Python module to calc IP, Mask, Network and Broadcast
 
 # Version
-V3
+V4
