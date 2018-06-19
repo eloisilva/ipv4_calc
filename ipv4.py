@@ -4,7 +4,7 @@
 #     Version             :     V4
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-05-21 19:36]
-#     Last Modified       :     [2018-06-19 15:38]
+#     Last Modified       :     [2018-06-19 15:57]
 #     Description         :      
 #################################################################################
 
@@ -24,6 +24,28 @@ def ip_calc(ip):
     network = network_calc(ip, mask)
     broadcast = broadcast_calc(mask, network)
     return (ip, mask, network, broadcast)
+
+def network_to_hosts(ipaddr):
+    '''
+    Arg:
+        ip: receive a ipv4/cidr as argument
+    Return:
+        All hosts in a /32 cidr
+    '''
+    try:
+        ip, mask, network, broadcast = ip_calc(ipaddr)
+    except Exception:
+        sys.stderr.write('Error trying to calc ipv4 => %s' % ipaddr)
+        return None
+    else:
+        try:
+            hosts = hosts_calc(network, broadcast)
+        except Exception:
+            sys.stderr.write('Error trying to calc hosts => %s' % ipaddr)
+            return None
+        else:
+            return sorted(hosts)
+
 
 def ip_check(ip):
     '''
