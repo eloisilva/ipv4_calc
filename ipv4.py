@@ -4,7 +4,7 @@
 #     Version             :     V4
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-05-21 19:36]
-#     Last Modified       :     [2018-06-19 15:57]
+#     Last Modified       :     [2018-06-19 17:44]
 #     Description         :      
 #################################################################################
 
@@ -25,12 +25,12 @@ def ip_calc(ip):
     broadcast = broadcast_calc(mask, network)
     return (ip, mask, network, broadcast)
 
-def network_to_hosts(ipaddr):
+def network_to_hosts(ipaddr, count=0):
     '''
     Arg:
         ip: receive a ipv4/cidr as argument
     Return:
-        All hosts in a /32 cidr
+        A interator of hosts ipv4 address
     '''
     try:
         ip, mask, network, broadcast = ip_calc(ipaddr)
@@ -39,12 +39,12 @@ def network_to_hosts(ipaddr):
         return None
     else:
         try:
-            hosts = hosts_calc(network, broadcast)
+            hosts = hosts_calc(network, broadcast, count=count)
         except Exception:
             sys.stderr.write('Error trying to calc hosts => %s' % ipaddr)
             return None
         else:
-            return sorted(hosts)
+            return map(convert_bits_to_ip, sorted(hosts))
 
 
 def ip_check(ip):
@@ -164,18 +164,20 @@ def broadcast_calc(mask, network):
     else:
         return network
 
-def hosts_calc(network, broadcast):
+def hosts_calc(network, broadcast, count=0):
     '''
     Calculate every host inside the network
     Args:
        network: string bits notation
        broadcast: string bits notation
-    Return: List of string bits notation of all hosts inside the network
+       count: how many address to return, starting on network address
+    Return: Set of string bits notation of all hosts inside the network
     '''
-    hosts = set([network, broadcast])
+    hosts = set()
     first, last = int(network, base=2), int(broadcast, base=2)
-    for host in range(first, last):
-        hosts.add(bin(host)[2:])
+    for c, host in enumerate(range(first, last+1)):
+        if count > 0 and c == count: break
+        hosts.add(convert_decimal_to_bits(host, bits_total=32))
     return hosts
 
 def print_ip_calc(ip):
