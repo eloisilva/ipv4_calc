@@ -1,10 +1,9 @@
 #! /usr/bin/env python3
 #################################################################################
-#     File Name           :     ipv4.py
-#     Version             :     V4
+#     File Name           :     ipv4_calc/__main__.py
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-05-21 19:36]
-#     Last Modified       :     [2018-06-19 17:44]
+#     Last Modified       :     [2018-06-20 12:01]
 #     Description         :      
 #################################################################################
 
@@ -44,7 +43,8 @@ def network_to_hosts(ipaddr, count=0):
             sys.stderr.write('Error trying to calc hosts => %s' % ipaddr)
             return None
         else:
-            return map(convert_bits_to_ip, sorted(hosts))
+            #return map(convert_bits_to_ip, sorted(hosts))
+            return list(map(convert_bits_to_ip, sorted(hosts)))
 
 
 def ip_check(ip):
@@ -189,16 +189,16 @@ def print_ip_calc(ip):
     print('%-15s %-15s %-15s %-15s' % (ip, mask, network, broadcast))
 
 def show_hosts(hosts):
-    for host in sorted(hosts):
-        print(convert_bits_to_ip(host) + '/32')
+    for host in hosts:
+        print(host + '/32')
 
 # Exec main test
-def main(ips):
-    for ip in ips:
-        ip, mask, network, broadcast = ip_calc(ip)
-        hosts = hosts_calc(network, broadcast)
+def main():
+    IPs = sys.argv[1:]
+    for ip in IPs:
+        hosts = network_to_hosts(ip)
         show_hosts(hosts)
         input('\n----Press Enter----')
 
 if __name__ == '__main__':
-    main(IPs)
+    main()
