@@ -3,7 +3,7 @@
 #     File Name           :     setup.py
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-06-20 11:52]
-#     Last Modified       :     [2018-06-20 12:03]
+#     Last Modified       :     [2018-06-20 20:49]
 #     Description         :      
 #################################################################################
 
@@ -22,4 +22,5 @@ setup(
             'disaggregate = ipv4_calc.__main__:main',
         ],
     },
+    install_requires=[],
 )
