@@ -3,7 +3,7 @@
 #     File Name           :     ipv4_calc/__main__.py
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-06-20 14:18]
-#     Last Modified       :     [2018-06-20 18:18]
+#     Last Modified       :     [2018-07-26 17:43]
 #     Description         :      
 #################################################################################
 
@@ -39,7 +39,10 @@ def main():
         IPs += args.IPs
     for ip in IPs:
         hosts = ipv4.network_to_hosts(ip)
-        ipv4.show_hosts(hosts)
+        if hosts:
+            ipv4.show_hosts(hosts)
+        else:
+            print('[Error] - There is no IPv4 to calculate')
 
 if __name__ == '__main__':
     main()

@@ -3,7 +3,7 @@
 #     File Name           :     ipv4_calc/__main__.py
 #     Created By          :     Eloi Silva (etch.linux@gmail.com)
 #     Creation Date       :     [2018-05-21 19:36]
-#     Last Modified       :     [2018-06-20 14:32]
+#     Last Modified       :     [2018-07-26 17:45]
 #     Description         :      
 #################################################################################
 
@@ -34,7 +34,6 @@ def network_to_hosts(ipaddr, count=0):
     try:
         ip, mask, network, broadcast = ip_calc(ipaddr)
     except Exception:
-        sys.stderr.write('Error trying to calc ipv4 => %s' % ipaddr)
         return None
     else:
         try:
@@ -58,14 +57,14 @@ def ip_check(ip):
     '''
     try:
         # Check IPv4 blocks and mask and return ip octet blocks and CIDR mask
-        ip_blocks = [block for block in map(ip_oct_check, ip.rstrip().lstrip().split('/')[0].split('.')) if block]
+        ip_blocks = [block for block in map(ip_oct_check, ip.rstrip().lstrip().split('/')[0].split('.')) if block is not False]
         mask = int(ip.split('/')[1]) if len(ip.split('/')) == 2 else 32
         if len(ip_blocks) == 4:
             return ip_blocks_to_bin(ip_blocks), convert_int_to_bits(mask)
         else:
             raise ValueError("Value is not a IPv4")
     except Exception:
-        sys.stderr.write('Invalid IPv4: %s' % ip)
+        sys.stderr.write('Invalid IPv4: %s\n' % ip)
         return None
 
 def ip_blocks_to_bin(ip):
