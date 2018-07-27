@@ -4,7 +4,7 @@ Python module to calc IP, Mask, Network and Broadcast
 The main function is a disaggregate
 
 
-# Version 4.1.0
+# Version 4.1.1
 This version of ipv4_calc can be installed as a package using pip.
 
 
